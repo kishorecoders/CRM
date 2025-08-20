@@ -1,33 +1,43 @@
 version: 2.1
 
-executors:
-  python-executor:
-    docker:
-      - image: cimg/python:3.11
-
 jobs:
   deploy:
-    executor: python-executor
+    docker:
+      - image: cimg/python:3.11
     steps:
       - checkout
 
-      # Install dependencies
       - run:
-          name: Install dependencies
+          name: Install system dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y \
+              build-essential \
+              cmake \
+              g++ \
+              libopenblas-dev \
+              liblapack-dev \
+              libx11-dev \
+              libjpeg-dev \
+              libpng-dev \
+              libfreetype6-dev \
+              zlib1g-dev
+
+      - run:
+          name: Install Python dependencies
           command: |
             python -m pip install --upgrade pip
             pip install -r requirements.txt
             pip install awsebcli
 
-      # Deploy to Elastic Beanstalk
       - run:
           name: Deploy to Elastic Beanstalk
           command: |
             eb init crm-app --platform python-3.11 --region $AWS_DEFAULT_REGION
-            eb deploy crm-env --staged
+            eb use crm-env
+            eb deploy
 
 workflows:
-  version: 2
   deploy-workflow:
     jobs:
       - deploy
