@@ -10,7 +10,6 @@ from src.EmployeeTasks.service import start_scheduler
 from src.Attendance.service import start_sign_out_scheduler
 from src.ProductStages.service import start_scheduler1
 
-
 #def init_db():
 SQLModel.metadata.create_all(engine)
 
@@ -18,15 +17,12 @@ SQLModel.metadata.create_all(engine)
 db = SessionLocal()
 app = FastAPI()
 
-
-
 @app.on_event("startup")
 def startup_event():
     
     start_scheduler()
     start_sign_out_scheduler()
     start_scheduler1()
-    
 
 @app.on_event("shutdown")
 def shutdown_event():
@@ -34,12 +30,6 @@ def shutdown_event():
     from apscheduler.schedulers.background import BackgroundScheduler
     scheduler = BackgroundScheduler()
     scheduler.shutdown()
-
-
-
-
-
-
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
