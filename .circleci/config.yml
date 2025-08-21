@@ -21,7 +21,8 @@ jobs:
               libjpeg-dev \
               libpng-dev \
               libfreetype6-dev \
-              zlib1g-dev
+              zlib1g-dev \
+              libjxl-dev
 
       - run:
           name: Install Python dependencies
