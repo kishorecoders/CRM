@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   deploy:
     docker:
-      - image: cimg/python:3.9
+      - image: cimg/python:3.12
     steps:
       - checkout
 
@@ -36,7 +36,7 @@ jobs:
       - run:
           name: Deploy to Elastic Beanstalk
           command: |
-            eb init crm-app --platform python-3.9 --region $AWS_DEFAULT_REGION
+            eb init crm-app --platform python-3.12 --region $AWS_DEFAULT_REGION
             eb use crm-env
             eb deploy
 
