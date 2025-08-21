@@ -3,9 +3,15 @@ version: 2.1
 jobs:
   deploy:
     docker:
-      - image: cimg/python:3.12
+      - image: cimg/python:3.10 
     steps:
       - checkout
+
+      # Cache pip dependencies to speed up builds
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
 
       - run:
           name: Install system dependencies for dlib
@@ -25,20 +31,28 @@ jobs:
               libfreetype6-dev \
               zlib1g-dev \
               libboost-all-dev
+          no_output_timeout: 30m
 
       - run:
           name: Install Python dependencies
           command: |
-            python -m pip install --upgrade pip
+            python -m pip install --upgrade pip setuptools wheel
             pip install -r requirements.txt
             pip install awsebcli
+          no_output_timeout: 30m
+
+      - save_cache:
+          paths:
+            - ~/.cache/pip
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
 
       - run:
           name: Deploy to Elastic Beanstalk
           command: |
-            eb init crm-app --platform python-3.12 --region $AWS_DEFAULT_REGION
+            eb init crm-app --platform python-3.10 --region $AWS_DEFAULT_REGION
             eb use crm-env
             eb deploy
+          no_output_timeout: 30m
 
 workflows:
   deploy-workflow:
